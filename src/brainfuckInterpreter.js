@@ -10,7 +10,7 @@ export default class Interpreter {
         this.running = false;
 
         this._ins_pointer = 0;
-        this._mem_pointer = 0;
+        this._mem_pointer = Math.floor(this.memsize / 2);
         this.memory = new Array(this.memsize).fill(0);
         this.stack = [];
     }
