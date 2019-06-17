@@ -24,13 +24,17 @@ class Machine extends Component {
         super(props);
         this.interpreter = new Interpreter(300);
         const machine_state = this.interpreter.state;
+	const mem_history = new Array(100);
+	for (var i = 0; i < 100; i++) {
+	    mem_history[i] = new Array(300).fill(0);
+	}
         this.state = {
             source: "",
             length: 10,
             speed: 300,
             running: false,
             locked: false,
-            memory: machine_state.memory,
+            memory: mem_history,
             ins_pointer: machine_state.ins_pointer,
             mem_pointer: machine_state.mem_pointer
         };
@@ -38,8 +42,11 @@ class Machine extends Component {
 
     updateMachineState() {
         const machine_state = this.interpreter.state;
+	const mem_history = this.state.memory;
+	mem_history.shift();
+	mem_history.push(Array.from(machine_state.memory));
         this.setState({
-            memory: machine_state.memory,
+            memory: mem_history,
             ins_pointer: machine_state.ins_pointer,
             mem_pointer: machine_state.mem_pointer
         });
@@ -157,9 +164,12 @@ class Machine extends Component {
 
     step() {
         const new_state = this.interpreter.step();
+	const mem_history = this.state.memory;
+	mem_history.shift();
+	mem_history.push(Array.from(new_state.memory));
         this.setState({
             locked: true,
-            memory: new_state.memory,
+            memory: mem_history,
             ins_pointer: new_state.ins_pointer,
             mem_pointer: new_state.mem_pointer
         });
@@ -289,8 +299,32 @@ class SourceBox extends Component {
 }
 
 class Bitmap extends Component {
+    componentDidMount() {
+	this.updateCanvas();
+    }
+
+    componentDidUpdate() {
+	this.updateCanvas();
+    }
+
+    updateCanvas() {
+        const mem = this.props.memory.flat();
+	const ctx = this.refs.canvas.getContext("2d");
+
+	for(var x = 0; x < 100; x++) {
+	    for(var y = 0; y < 100; y++) {
+		var r = mem[300 * y + 3 * x];
+		var g = mem[300 * y + 3 * x + 1];
+		var b = mem[300 * y + 3 * x + 2];
+
+		ctx.fillStyle = "rgb("+r+","+g+","+b+")";
+		ctx.fillRect (x, y, 1, 1);
+	    }
+	}
+    }
+
     render() {
-        const mem = this.props.memory;
+        const mem = this.props.memory.flat();
 
         // var pixels = Array(Math.floor(mem.length / 3))
         const pixels = mem.map((v, i, l) => i % 3 == 0 ? <Pixel key={i} r={v} g={l[i+1]} b={l[i+2]} /> : null).filter(v => v);
@@ -306,9 +340,7 @@ class Bitmap extends Component {
 //            )
 //        }
         return (
-            <div className="bitmap">
-            {pixels}
-            </div>
+		<canvas className="bitmap" ref="canvas" width={100} height={100}/>
         )
     }
 }
