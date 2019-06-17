@@ -200,7 +200,7 @@ class Machine extends Component {
                         </div>
                         <div className="sliders">
                             <div className="slider">
-                              <label for="length"><FontAwesomeIcon icon={faRuler} size="2x"/></label>
+                              <label htmlFor="length"><FontAwesomeIcon icon={faRuler} size="2x"/></label>
                               <Slider
                                   id="length"
                                   min="1"
@@ -210,7 +210,7 @@ class Machine extends Component {
                               />
                             </div>
                             <div className="slider">
-                                <label for="speed"><FontAwesomeIcon icon={faTachometerAlt} size="2x"/></label>
+                                <label htmlFor="speed"><FontAwesomeIcon icon={faTachometerAlt} size="2x"/></label>
                                 <Slider
                                     id="speed"
                                     min="1"
